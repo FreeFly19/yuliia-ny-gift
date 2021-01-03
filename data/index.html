@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>WiFi</title>
+</head>
+<body>
+<div style="text-align: center">
+    <table>
+        <tr>
+            <td>SSID</td>
+            <td><input type="text" id="ssid"></td>
+        </tr>
+        <tr>
+            <td>Password</td>
+            <td><input type="text" id="password"></td>
+        </tr>
+        <tr>
+            <td>Telegram Bot Token</td>
+            <td><input type="text" id="botToken"></td>
+        </tr>
+        <tr>
+            <td>Telegram Chat ID <a href="https://telegram.me/get_id_bot" title="Get My Chat ID">?</a></td>
+            <td><input type="text" id="botChatId"></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button style="width: 100%;" id="save-button">Save</button>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+        const buttonEl = document.getElementById('save-button');
+        const ssidEl = document.getElementById('ssid');
+        const passwordEl = document.getElementById('password');
+        const botTokenEl = document.getElementById('botToken');
+        const botChatIdEl = document.getElementById('botChatId');
+
+        fetch('/api/config')
+            .then(res => res.json())
+            .then(config => {
+                ssidEl.value = config.ssid;
+                passwordEl.value = config.password;
+                botTokenEl.value = config.botToken;
+                botChatIdEl.value = config.botChatId;
+            });
+
+        buttonEl.addEventListener('click', () => {
+            const config = {
+                ssid: ssidEl.value,
+                password: passwordEl.value,
+                botToken: botTokenEl.value,
+                botChatId: botChatIdEl.value
+            };
+
+            fetch('/api/config', {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify(config)
+            }).then(() => {
+                buttonEl.textContent = 'Saved! Restarting...';
+            });
+            buttonEl.disabled = 'disabled';
+            buttonEl.textContent = 'Saving...';
+        });
+    </script>
+</div>
+</body>
+</html>
